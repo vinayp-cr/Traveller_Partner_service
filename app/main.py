@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 from app.api.controllers import hotel_controller, search_filters_controller, search_filters_controller_consolidated, scheduler_controller, filter_data_controller, auth_controller, data_population_controller, hotel_filter_controller, terrapay_webhook_controller
-from app.ai.chatbot.controllers import chat_controller
+from app.ai.chatbot.controllers.chat_controller import router as chat_router
 from app.utilities.message_loader import message_loader
 from app.services.scheduler_service import scheduler_service
 
@@ -65,7 +65,7 @@ app.include_router(hotel_filter_controller.router, prefix="/api/hotel", tags=["H
 app.include_router(terrapay_webhook_controller.router, prefix="/api", tags=["TerraPay Webhooks"])
 
 # Include chatbot routes
-app.include_router(chat_controller.router, tags=["Chatbot"])
+app.include_router(chat_router, tags=["Chatbot"])
 
 # Serve static files (dashboard and chatbot)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

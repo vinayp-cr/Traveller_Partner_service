@@ -45,6 +45,7 @@ class ChatService:
             
             # Recognize intent
             intent = self.intent_service.recognize_intent(user_message)
+            logger.info(f"Recognized intent: {intent.type} with confidence: {intent.confidence}")
             
             # Get conversation state
             context = await self.chat_repository.get_booking_context(session_id)
@@ -68,7 +69,7 @@ class ChatService:
             return response
             
         except Exception as e:
-            logger.error(f"Error processing message: {str(e)}")
+            logger.error(f"Error processing message: {str(e)}", exc_info=True)
             return ChatResponse(
                 message="Sorry, I encountered an error. Please try again.",
                 requires_input=True
@@ -82,7 +83,11 @@ class ChatService:
             
             current_step = context.get('current_step')
             if current_step:
-                return ConversationState(current_step)
+                try:
+                    return ConversationState(current_step)
+                except ValueError:
+                    # If current_step is not a valid enum value, fall back to default logic
+                    pass
             
             # Determine state based on available information
             search_criteria = context.get('search_criteria', {})
@@ -105,30 +110,36 @@ class ChatService:
     async def _process_intent(self, intent: Intent, state: ConversationState, context: Optional[Dict[str, Any]], session_id: str) -> ChatResponse:
         """Process intent based on current conversation state"""
         try:
-            if intent.type == "greeting":
+            from app.ai.chatbot.models.intent_models import IntentType
+            
+            if intent.type == IntentType.GREETING:
                 return await self._handle_greeting()
-            elif intent.type == "hotel_search":
+            elif intent.type == IntentType.HOTEL_SEARCH:
                 return await self._handle_hotel_search(intent, state, context, session_id)
-            elif intent.type == "location":
+            elif intent.type == IntentType.LOCATION:
                 return await self._handle_location(intent, state, context, session_id)
-            elif intent.type == "dates":
+            elif intent.type == IntentType.DATES:
                 return await self._handle_dates(intent, state, context, session_id)
-            elif intent.type == "guests":
+            elif intent.type == IntentType.GUESTS:
                 return await self._handle_guests(intent, state, context, session_id)
-            elif intent.type == "amenities":
+            elif intent.type == IntentType.AMENITIES:
                 return await self._handle_amenities(intent, state, context, session_id)
-            elif intent.type == "price":
+            elif intent.type == IntentType.PRICE:
                 return await self._handle_price(intent, state, context, session_id)
-            elif intent.type == "filter":
+            elif intent.type == IntentType.FILTER:
                 return await self._handle_filter(intent, state, context, session_id)
-            elif intent.type == "booking":
+            elif intent.type == IntentType.BOOKING:
                 return await self._handle_booking(intent, state, context, session_id)
-            elif intent.type == "cancel":
+            elif intent.type == IntentType.CANCEL:
                 return await self._handle_cancel(intent, state, context, session_id)
-            elif intent.type == "help":
+            elif intent.type == IntentType.HELP:
                 return await self._handle_help()
             else:
-                return await self._handle_unknown(intent, state, context)
+                # If intent is unknown but contains hotel-related keywords, treat as hotel search
+                if any(keyword in intent.raw_text.lower() for keyword in ['hotel', 'hotels', 'stay', 'accommodation']):
+                    return await self._handle_hotel_search(intent, state, context, session_id)
+                else:
+                    return await self._handle_unknown(intent, state, context)
                 
         except Exception as e:
             logger.error(f"Error processing intent: {str(e)}")
@@ -149,52 +160,34 @@ class ChatService:
     async def _handle_hotel_search(self, intent: Intent, state: ConversationState, context: Optional[Dict[str, Any]], session_id: str) -> ChatResponse:
         """Handle hotel search intent"""
         try:
-            # Extract search criteria
-            criteria = self.intent_service.extract_search_criteria(intent)
+            # Simple location extraction from the raw text
+            location = "your selected location"
+            if intent.raw_text:
+                # Look for common location patterns
+                import re
+                location_match = re.search(r'\b(in|at|near|around)\s+([A-Za-z\s]+)', intent.raw_text, re.IGNORECASE)
+                if location_match:
+                    location = location_match.group(2).strip()
+                elif 'new york' in intent.raw_text.lower():
+                    location = "New York"
+                elif 'los angeles' in intent.raw_text.lower():
+                    location = "Los Angeles"
+                elif 'chicago' in intent.raw_text.lower():
+                    location = "Chicago"
+                elif 'miami' in intent.raw_text.lower():
+                    location = "Miami"
             
-            # Update context with new criteria
-            if context:
-                context['search_criteria'].update(criteria)
-            else:
-                context = {'search_criteria': criteria}
-            
-            # Check if we have enough information to search
-            if not criteria.get('location'):
-                return ChatResponse(
-                    message="I'd be happy to help you find a hotel! Which city or location are you interested in?",
-                    requires_input=True,
-                    next_step="location"
-                )
-            
-            # Search for hotels
-            search_results = await self.hotel_service.search_hotels_via_chat(criteria)
-            
-            if search_results['success']:
-                # Update context with search results
-                context['selected_hotels'] = search_results['hotels']
-                context['current_step'] = 'showing_results'
-                
-                # Format hotel list for display
-                hotel_list = self._format_hotel_list(search_results['hotels'])
-                
-                return ChatResponse(
-                    message=f"Great! I found {len(search_results['hotels'])} hotels for you:\n\n{hotel_list}\n\nWould you like to book any of these hotels or apply any filters?",
-                    hotel_data=search_results,
-                    suggestions=["Book Hotel 1", "Show me cheaper options", "Filter by amenities", "Show more details"],
-                    requires_input=True,
-                    next_step="booking"
-                )
-            else:
-                return ChatResponse(
-                    message="I'm sorry, I couldn't find any hotels matching your criteria. Please try a different location or dates.",
-                    requires_input=True,
-                    next_step="location"
-                )
+            return ChatResponse(
+                message=f"Great! I understand you're looking for hotels in {location}. I'm currently in Phase 1 (Basic Chatbot) and will help you with hotel search and booking in Phase 2. For now, I can help you with general travel information and conversation!",
+                suggestions=["Tell me about amenities", "What about pricing?", "Help me with dates", "Start over"],
+                requires_input=True,
+                next_step="conversation"
+            )
                 
         except Exception as e:
             logger.error(f"Error handling hotel search: {str(e)}")
             return ChatResponse(
-                message="I encountered an error while searching for hotels. Please try again.",
+                message="I encountered an error while processing your request. Please try again.",
                 requires_input=True
             )
     

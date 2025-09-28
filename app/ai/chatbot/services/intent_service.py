@@ -28,8 +28,9 @@ class IntentService:
             ],
             IntentType.HOTEL_SEARCH: [
                 r'\b(hotel|hotels|accommodation|stay|book|reserve)\b',
-                r'\b(find|search|look for|need)\b.*\b(hotel|place to stay)\b',
-                r'\b(where|where can|where should)\b.*\b(stay|sleep)\b'
+                r'\b(find|search|look for|need|want|show me)\b.*\b(hotel|place to stay)\b',
+                r'\b(where|where can|where should)\b.*\b(stay|sleep)\b',
+                r'\b(want|need|looking for)\b.*\b(hotel|hotels)\b'
             ],
             IntentType.LOCATION: [
                 r'\b(in|at|near|around|close to)\b',

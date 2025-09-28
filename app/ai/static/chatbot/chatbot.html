@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Assistant Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chatbot-container {
+            width: 400px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chatbot-header h1 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .chatbot-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: #667eea;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e1e5e9;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .suggestions {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .suggestion {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .suggestion:hover {
+            background: #1976d2;
+            color: white;
+        }
+
+        .hotel-card {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .hotel-card h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .hotel-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .hotel-card .price {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .hotel-card .rating {
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        .chatbot-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e1e5e9;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .input-field:focus {
+            border-color: #667eea;
+        }
+
+        .send-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .send-button:hover {
+            background: #5a6fd8;
+            transform: scale(1.05);
+        }
+
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4caf50;
+        }
+
+        .status-indicator.offline {
+            background: #f44336;
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .chatbot-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-container">
+        <div class="chatbot-header">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <h1>🤖 Travel Assistant</h1>
+            <p>I can help you find and book hotels!</p>
+        </div>
+        
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="welcome-message">
+                Welcome! I'm here to help you find the perfect hotel. Just tell me where you'd like to stay!
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <span>Bot is typing</span>
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+        
+        <div class="chatbot-input">
+            <div class="input-container">
+                <input type="text" id="messageInput" class="input-field" placeholder="Type your message..." autocomplete="off">
+                <button id="sendButton" class="send-button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TravelChatbot {
+            constructor() {
+                this.sessionId = this.generateSessionId();
+                this.isTyping = false;
+                this.initializeElements();
+                this.attachEventListeners();
+                this.sendWelcomeMessage();
+            }
+
+            initializeElements() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                this.statusIndicator = document.getElementById('statusIndicator');
+            }
+
+            attachEventListeners() {
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+            }
+
+            generateSessionId() {
+                return 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            async sendWelcomeMessage() {
+                const welcomeMessage = {
+                    message: "Hello! I'm your travel assistant. I can help you find and book hotels. Where would you like to stay?",
+                    suggestions: ["New York", "Los Angeles", "Chicago", "Miami"],
+                    requires_input: true,
+                    next_step: "location"
+                };
+                
+                this.displayBotMessage(welcomeMessage);
+            }
+
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message || this.isTyping) return;
+
+                // Display user message
+                this.displayUserMessage(message);
+                this.messageInput.value = '';
+
+                // Show typing indicator
+                this.showTypingIndicator();
+
+                try {
+                    const response = await fetch('/api/chat/message', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            session_id: this.sessionId
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.displayBotMessage(data);
+                    } else {
+                        this.displayError('Failed to process message. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    this.displayError('Connection error. Please check your internet connection.');
+                } finally {
+                    this.hideTypingIndicator();
+                }
+            }
+
+            displayUserMessage(message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message user';
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        ${this.escapeHtml(message)}
+                        <div class="message-time">${this.getCurrentTime()}</div>
+                    </div>
+                `;
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            displayBotMessage(data) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot';
+                
+                let content = this.escapeHtml(data.message);
+                
+                // Add hotel data if available
+                if (data.hotel_data && data.hotel_data.hotels) {
+                    content += this.formatHotelData(data.hotel_data.hotels);
+                }
+                
+                // Add booking data if available
+                if (data.booking_data) {
+                    content += this.formatBookingData(data.booking_data);
+                }
+                
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        ${content}
+                        <div class="message-time">${this.getCurrentTime()}</div>
+                        ${data.suggestions ? this.formatSuggestions(data.suggestions) : ''}
+                    </div>
+                `;
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            formatHotelData(hotels) {
+                if (!hotels || hotels.length === 0) return '';
+                
+                let html = '<div style="margin-top: 15px;">';
+                hotels.slice(0, 3).forEach((hotel, index) => {
+                    html += `
+                        <div class="hotel-card">
+                            <h3>${this.escapeHtml(hotel.name || 'Unknown Hotel')}</h3>
+                            <p><strong>Address:</strong> ${this.escapeHtml(hotel.address || 'N/A')}</p>
+                            <p><strong>Price:</strong> <span class="price">$${hotel.price || 'N/A'} ${hotel.currency || 'USD'}</span></p>
+                            <p><strong>Rating:</strong> <span class="rating">${hotel.rating || 'N/A'}/5</span></p>
+                            ${hotel.amenities ? `<p><strong>Amenities:</strong> ${hotel.amenities.slice(0, 3).join(', ')}</p>` : ''}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                return html;
+            }
+
+            formatBookingData(bookingData) {
+                if (!bookingData) return '';
+                
+                let html = '<div class="success-message">';
+                html += `<strong>Booking Confirmed!</strong><br>`;
+                html += `Booking ID: ${this.escapeHtml(bookingData.booking_id || 'N/A')}<br>`;
+                html += `Status: ${this.escapeHtml(bookingData.confirmation || 'Confirmed')}`;
+                html += '</div>';
+                return html;
+            }
+
+            formatSuggestions(suggestions) {
+                if (!suggestions || suggestions.length === 0) return '';
+                
+                let html = '<div class="suggestions">';
+                suggestions.forEach(suggestion => {
+                    html += `<button class="suggestion" onclick="chatbot.selectSuggestion('${this.escapeHtml(suggestion)}')">${this.escapeHtml(suggestion)}</button>`;
+                });
+                html += '</div>';
+                return html;
+            }
+
+            selectSuggestion(suggestion) {
+                this.messageInput.value = suggestion;
+                this.sendMessage();
+            }
+
+            displayError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                this.chatMessages.appendChild(errorDiv);
+                this.scrollToBottom();
+            }
+
+            showTypingIndicator() {
+                this.isTyping = true;
+                this.typingIndicator.style.display = 'flex';
+                this.sendButton.disabled = true;
+                this.scrollToBottom();
+            }
+
+            hideTypingIndicator() {
+                this.isTyping = false;
+                this.typingIndicator.style.display = 'none';
+                this.sendButton.disabled = false;
+            }
+
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                }, 100);
+            }
+
+            getCurrentTime() {
+                return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Initialize chatbot when page loads
+        const chatbot = new TravelChatbot();
+    </script>
+</body>
+</html>

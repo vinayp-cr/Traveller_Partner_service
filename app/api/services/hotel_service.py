@@ -2141,6 +2141,10 @@ class HotelService:
                             booking_details = await self.save_booking_to_database(db, data, request, pricing_token)
                             data["database_booking"] = booking_details
                             logger.info(f"Booking {request.booking_id} saved to database successfully")
+                            
+                            # Process payment through Terrapay (completely non-blocking - never fails the booking)
+                            await self._process_payment_safely(db, data, request, pricing_token)
+                            
                         except Exception as e:
                             logger.error(f"Error saving booking to database: {str(e)}")
                             # Don't fail the booking if database save fails
@@ -2721,6 +2725,37 @@ class HotelService:
             logger.error(f"Error saving hotel price results v2: {str(e)}")
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise e
+
+    async def _process_payment_safely(self, db: Session, booking_data: Dict[str, Any], request: BookHotelRequest, pricing_token: str) -> None:
+        """
+        Safely process payment through Terrapay without ever failing the booking.
+        This method is completely non-blocking and will never raise exceptions.
+        """
+        try:
+            # Check if Terrapay integration is enabled
+            terrapay_enabled = config.get('terrapay', {}).get('enabled', True)
+            if not terrapay_enabled:
+                logger.info("Terrapay integration is disabled, skipping payment processing")
+                return
+            
+            # Process payment in a separate try-catch to ensure it never affects the booking
+            payment_result = await self.process_booking_payment(db, booking_data, request, pricing_token)
+            booking_data["payment_processing"] = payment_result
+            logger.info(f"Payment processing completed successfully for booking {request.booking_id}")
+            
+        except Exception as payment_error:
+            # Log the error but never fail the booking
+            logger.error(f"Payment processing failed for booking {request.booking_id}: {str(payment_error)}")
+            logger.error(f"Payment error traceback: {traceback.format_exc()}")
+            
+            # Add error info to response without failing the booking
+            booking_data["payment_error"] = {
+                "error": str(payment_error),
+                "timestamp": datetime.utcnow().isoformat(),
+                "booking_id": request.booking_id
+            }
+            
+            logger.info(f"Booking {request.booking_id} completed successfully despite payment processing failure")
 
     async def process_booking_payment(
         self, 

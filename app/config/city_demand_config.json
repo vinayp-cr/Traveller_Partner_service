@@ -1,0 +1,184 @@
+{
+  "city_demand_levels": {
+    "high_demand": {
+      "refresh_interval_minutes": 15,
+      "cities": [
+        {
+          "name": "New York",
+          "state": "NY",
+          "country": "USA"
+        },
+        {
+          "name": "New Jersey",
+          "state": "NJ", 
+          "country": "USA"
+        },
+        {
+          "name": "Los Angeles",
+          "state": "CA",
+          "country": "USA"
+        },
+        {
+          "name": "Chicago",
+          "state": "IL",
+          "country": "USA"
+        },
+        {
+          "name": "Miami",
+          "state": "FL",
+          "country": "USA"
+        },
+        {
+          "name": "Las Vegas",
+          "state": "NV",
+          "country": "USA"
+        },
+        {
+          "name": "San Francisco",
+          "state": "CA",
+          "country": "USA"
+        },
+        {
+          "name": "Boston",
+          "state": "MA",
+          "country": "USA"
+        },
+        {
+          "name": "Washington",
+          "state": "DC",
+          "country": "USA"
+        },
+        {
+          "name": "Seattle",
+          "state": "WA",
+          "country": "USA"
+        }
+      ]
+    },
+    "medium_demand": {
+      "refresh_interval_minutes": 30,
+      "cities": [
+        {
+          "name": "Atlanta",
+          "state": "GA",
+          "country": "USA"
+        },
+        {
+          "name": "Dallas",
+          "state": "TX",
+          "country": "USA"
+        },
+        {
+          "name": "Houston",
+          "state": "TX",
+          "country": "USA"
+        },
+        {
+          "name": "Phoenix",
+          "state": "AZ",
+          "country": "USA"
+        },
+        {
+          "name": "Denver",
+          "state": "CO",
+          "country": "USA"
+        },
+        {
+          "name": "Nashville",
+          "state": "TN",
+          "country": "USA"
+        },
+        {
+          "name": "Austin",
+          "state": "TX",
+          "country": "USA"
+        },
+        {
+          "name": "Portland",
+          "state": "OR",
+          "country": "USA"
+        },
+        {
+          "name": "San Diego",
+          "state": "CA",
+          "country": "USA"
+        },
+        {
+          "name": "Orlando",
+          "state": "FL",
+          "country": "USA"
+        }
+      ]
+    },
+    "low_demand": {
+      "refresh_interval_minutes": 45,
+      "cities": [
+        {
+          "name": "Mexico City",
+          "state": "CDMX",
+          "country": "Mexico"
+        },
+        {
+          "name": "Cancun",
+          "state": "Quintana Roo",
+          "country": "Mexico"
+        },
+        {
+          "name": "Guadalajara",
+          "state": "Jalisco",
+          "country": "Mexico"
+        },
+        {
+          "name": "Monterrey",
+          "state": "Nuevo Leon",
+          "country": "Mexico"
+        },
+        {
+          "name": "Tijuana",
+          "state": "Baja California",
+          "country": "Mexico"
+        },
+        {
+          "name": "Puebla",
+          "state": "Puebla",
+          "country": "Mexico"
+        },
+        {
+          "name": "Merida",
+          "state": "Yucatan",
+          "country": "Mexico"
+        },
+        {
+          "name": "Toluca",
+          "state": "Mexico",
+          "country": "Mexico"
+        },
+        {
+          "name": "León",
+          "state": "Guanajuato",
+          "country": "Mexico"
+        },
+        {
+          "name": "Juárez",
+          "state": "Chihuahua",
+          "country": "Mexico"
+        }
+      ]
+    }
+  },
+  "scheduler_settings": {
+    "max_workers": 5,
+    "job_defaults": {
+      "coalesce": true,
+      "max_instances": 1,
+      "misfire_grace_time": 30
+    },
+    "timezone": "UTC"
+  },
+  "refresh_settings": {
+    "batch_size": 50,
+    "retry_attempts": 3,
+    "retry_delay_seconds": 60,
+    "enable_logging": true
+  }
+}

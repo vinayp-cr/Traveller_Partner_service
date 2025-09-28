@@ -1,0 +1,53 @@
+{
+  "responses": {
+    "success": {
+      "hotel_search_completed": "Hotel search completed successfully",
+      "hotel_booking_completed": "Hotel booking completed successfully",
+      "hotel_booking_completed_no_db": "Hotel booking completed successfully (no database saving)",
+      "hotel_booking_completed_db_failed": "Hotel booking completed successfully (database save failed)",
+      "autosuggest_completed": "Hotel autosuggest completed successfully",
+      "rooms_rates_completed": "Rooms and rates retrieved successfully",
+      "price_recommendation_completed": "Price recommendation retrieved successfully",
+      "booking_details_completed": "Booking details retrieved successfully",
+      "cancellation_penalty_completed": "Cancellation penalty retrieved successfully",
+      "booking_cancelled": "Hotel booking cancelled successfully"
+    },
+    "errors": {
+      "service_error": "Service error",
+      "booking_api_error": "Booking API error",
+      "hotelier_service_error": "Hotelier Service error",
+      "price_recommendation_error": "Error calling Hotelier Service Price Recommendation API",
+      "booking_details_error": "Error calling Hotelier Service Booking Details API",
+      "cancellation_penalty_error": "Error calling Hotelier Service Cancellation Penalty API",
+      "booking_cancel_error": "Error calling Hotelier Service Cancel Booking API",
+      "autosuggest_error": "Error calling Hotelier Service Autosuggest API",
+      "rooms_rates_error": "Error calling Hotelier Service Rooms and Rates API",
+      "hotel_search_error": "Error calling Hotelier Service Hotel Search API",
+      "hotel_booking_error": "Hotel booking error",
+      "hotel_booking_network_error": "Hotel booking network error"
+    },
+    "info": {
+      "hotels_found": "hotels_found",
+      "hotels": "hotels",
+      "booking_id": "booking_id",
+      "booking_ref_id": "booking_ref_id",
+      "booking_record": "booking_record",
+      "api_response": "api_response",
+      "database_error": "database_error",
+      "data": "data",
+      "cache_hit": "cache_hit",
+      "cache_miss": "cache_miss",
+      "search_hash": "search_hash",
+      "response_time": "response_time"
+    }
+  },
+  "service_info": {
+    "name": "Hotel Integration API",
+    "version": "1.0.0",
+    "description": "Hotel Integration Service for Travel Partners"
+  },
+  "health_check": {
+    "status": "healthy",
+    "service": "Hotel Integration API"
+  }
+}

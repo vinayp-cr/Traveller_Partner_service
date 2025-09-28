@@ -1,0 +1,40 @@
+{
+    "api": {
+        "base_url": "https://uat-ipservice.terrapay.com/prepaidservices/rest",
+        "token_endpoint": "/setupServices/setupService/generatePartnerToken",
+        "create_card_endpoint": "/cardManagementServices/cardManagementService/createCustomerAccountAndCard",
+        "timeout": 30.0
+    },
+    "headers": {
+        "default": {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        "token": {
+            "Content-Type": "application/json"
+        }
+    },
+    "authentication": {
+        "clientId": "YOUR_TERRAPAY_CLIENT_ID",
+        "username": "YOUR_TERRAPAY_USERNAME", 
+        "password": "YOUR_TERRAPAY_PASSWORD"
+    },
+    "defaults": {
+        "agent_card_profile_id": "4",
+        "currency": "USD",
+        "card_account_type": "PrepaidPayout",
+        "international_txn_supported": true
+    },
+    "charges": {
+        "service_charge_percentage": 10.0,
+        "additional_charge_percentage": 5.0
+    },
+    "retry": {
+        "max_retries": 3,
+        "retry_delay_seconds": 5
+    },
+    "webhook": {
+        "secret_key": "your_webhook_secret",
+        "enabled": true
+    }
+}

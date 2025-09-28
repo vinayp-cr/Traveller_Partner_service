@@ -1,0 +1,51 @@
+{
+  "api": {
+    "base_url": "https://uat.travelapi.ai",
+    "endpoints": {
+      "auth_generate": "/identity/v2/auth/generate",
+      "autosuggest": "/hotels/api/v2/autocomplete",
+      "hotel_search": "/hotels/api/v2/properties",
+      "get_hotel_Details": "https://uat.travelapi.ai/hotels/api/v2/property/",
+      "check_hotel_availability":"/hotels/api/v2/properties/availability",
+      "hotel_availability": "https://uat.travelapi.ai/hotels/api/v2/properties/availability",
+      "get_selected_hotel_pricing":"/hotels/api/v2/properties/price?availability_token={}&currency=USD",
+      "hotel_price": "https://uat.travelapi.ai/hotels/api/v2/properties/price",
+      "hotel_booking": "https://uat.travelapi.ai/hotels/api/v2/bookings",
+      "hotel_cancel_booking": "https://uat.travelapi.ai/hotels/api/v2/bookings",
+      "book_hotel": "/hotels/api/v2/bookings?pricing_token={pricing_token}",
+      "get_booking_details":"/hotels/api/v2/bookings/{booking_id}",
+      "cancel_booking": "/hotels/api/v2/bookings/{booking_id}"
+    }
+  },
+  "headers": {
+    "default": {
+      "x-api-key": "6427cfae-3889-49c0-8e46-07400d404f83",
+      "accept-language": "en",
+      "content-type": "application/json"
+    },
+    "required_headers": [
+      "x-api-key",
+      "accept-language"
+    ]
+  },
+  "auth": {
+    "api_key": "6427cfae-3889-49c0-8e46-07400d404f83",
+    "secret_key": "0f69344c-5db3-4555-b745-18187a0b9837",
+    "token_cache_duration": 3600
+  },
+  "timeouts": {
+    "default": 30.0,
+    "booking": 30.0
+  },
+  "pagination": {
+    "default_page": 1,
+    "default_limit": 50,
+    "max_limit": 100
+  },
+  "search_cache": {
+    "enabled": true,
+    "cache_duration_minutes": 30,
+    "max_cache_entries": 1000,
+    "cleanup_interval_hours": 24
+  }
+}

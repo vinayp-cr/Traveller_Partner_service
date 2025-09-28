@@ -1,0 +1,38 @@
+{
+  "database": {
+    "default": {
+      "host": "stage-db.c6xqiykeiiiz.us-east-1.rds.amazonaws.com",
+      "port": 3306,
+      "user": "root",
+      "password": "7~Vy8ig)aZKk#;S",
+      "name": "getmyhotels",
+      "driver": "mysql+pymysql"
+    },
+    "development": {
+      "host": "localhost",
+      "port": 3306,
+      "user": "root",
+      "password": "Yeaone12#",
+      "name": "getmyhotels",
+      "driver": "mysql+pymysql"
+    },
+    "production": {
+      "host": "getmyhotelsdb.c6xqiykeiiiz.us-east-1.rds.amazonaws.com",
+      "port": 3306,
+      "user": "root",
+      "password": "GMh2025#!",
+      "name": "getmyhotels",
+      "driver": "mysql+pymysql"
+    }
+  },
+  "connection_settings": {
+    "max_retries": 10,
+    "retry_delay_seconds": 3,
+    "echo_queries": false,
+    "pool_size": 20,
+    "max_overflow": 30,
+    "pool_timeout": 30,
+    "pool_recycle": 3600,
+    "pool_pre_ping": true
+  }
+}

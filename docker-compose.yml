@@ -1,0 +1,55 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: xeni-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Yeaone12#23
+      MYSQL_DATABASE: getmyhotels
+      MYSQL_USER: getmyhotels
+      MYSQL_PASSWORD: getmyhotels123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "getmyhotels", "-pgetmyhotels123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - xeni-network
+
+  app:
+    build: .
+    container_name: xeni-hotelier-api
+    ports:
+      - "8000:8000"
+    environment:
+      - XENI_API_KEY=${XENI_API_KEY}
+      - PYTHONPATH=/app
+      - DATABASE_URL=mysql+pymysql://root:7~Vy8ig)aZKk#;S@mysql:3306/getmyhotels
+    env_file:
+      - .env
+    volumes:
+      - ./app:/app/app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - xeni-network
+
+volumes:
+  mysql_data:
+
+networks:
+  xeni-network:
+    driver: bridge
